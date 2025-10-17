@@ -3,267 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captcha Solver</title>
+    <title>AI Captcha Solver</title>
+    <!-- Bootstrap 5 CSS from CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
-            padding-top: 20px;
-            padding-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .container {
             max-width: 800px;
+            margin-top: 50px;
+            margin-bottom: 50px;
             background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .captcha-image {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            border-radius: 4px;
-        }
-        .error-message {
-            color: #dc3545;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .success-message {
-            color: #28a745;
-            font-weight: bold;
-            margin-top: 15px;
+        h1 {
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 30px;
         }
         .form-label {
             font-weight: bold;
+            color: #495057;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        #captchaImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            display: block; /* Center the image if it's smaller than container */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #resultContainer {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            word-break: break-all; /* Ensure long results wrap */
+        }
+        #loadingSpinner {
+            display: none; /* Hidden by default */
+            margin-top: 20px;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1 class="text-center mb-4">AI Captcha Solver</h1>
-
-        <div class="mb-3 position-relative">
-            <label for="imageUrl" class="form-label">Image URL</label>
-            <input type="url" class="form-control" id="imageUrl" placeholder="Enter image URL (e.g., https://example.com/captcha.png)">
-            <button id="loadFromUrlBtn" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2">Load</button>
-        </div>
-
-        <div class="text-center mb-4">
-            <img id="captchaImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Captcha Image" class="captcha-image">
-            <div id="imageLoadingIndicator" class="loading-overlay d-none">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading image...</span>
-                </div>
-            </div>
-        </div>
+        <h1 class="display-5">AI Captcha Solver</h1>
 
         <div class="mb-3">
-            <label for="captchaInput" class="form-label">Enter Captcha Text</label>
-            <input type="text" class="form-control" id="captchaInput" placeholder="Enter the text from the image">
+            <label for="imageUrl" class="form-label">Image URL</label>
+            <input type="url" class="form-control" id="imageUrl" placeholder="Enter image URL (e.g., https://example.com/captcha.png)">
         </div>
 
         <div class="d-grid gap-2">
-            <button id="solveCaptchaBtn" class="btn btn-primary btn-lg">Solve Captcha</button>
+            <button id="solveButton" type="button" class="btn btn-primary btn-lg">Solve Captcha</button>
         </div>
 
-        <div id="resultArea" class="mt-4 text-center">
-            <div id="loadingSpinner" class="spinner-border text-primary d-none" role="status">
-                <span class="visually-hidden">Solving...</span>
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-            <div id="errorMessage" class="error-message d-none"></div>
-            <div id="successMessage" class="success-message d-none"></div>
+            <p class="mt-2">Solving...</p>
+        </div>
+
+        <!-- Image Display -->
+        <div id="imageContainer" class="mt-4 text-center">
+            <img id="captchaImage" src="" alt="Captcha Image Preview">
+        </div>
+
+        <!-- Result Display -->
+        <div id="resultContainer">
+            <p id="resultText" class="lead mb-0">Enter a URL and click "Solve Captcha" to see the result.</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+            An error occurred. Please check the URL and try again.
         </div>
     </div>
 
+    <footer class="footer">
+        <p>&copy; 2023 AI Captcha Solver. Powered by AI.</p>
+    </footer>
+
     <script>
         // --- Configuration ---
-        // Replace with your actual API endpoint for captcha solving.
-        // This is a placeholder and will not work without a backend.
-        const CAPTCHA_SOLVER_API_URL = 'YOUR_CAPTCHA_SOLVER_API_ENDPOINT'; // e.g., '/api/solve' or 'https://your-backend.com/solve'
+        // This is a placeholder for your actual AI API endpoint.
+        // In a real application, this would point to a backend service
+        // that communicates with an AI model for captcha solving.
+        const AI_SOLVER_API_URL = 'https://your-ai-solver-api.com/solve'; // REPLACE WITH YOUR ACTUAL API ENDPOINT
 
         // --- DOM Elements ---
-        const captchaImage = document.getElementById('captchaImage');
         const imageUrlInput = document.getElementById('imageUrl');
-        const loadFromUrlBtn = document.getElementById('loadFromUrlBtn');
-        const captchaInput = document.getElementById('captchaInput');
-        const solveCaptchaBtn = document.getElementById('solveCaptchaBtn');
-        const resultArea = document.getElementById('resultArea');
+        const solveButton = document.getElementById('solveButton');
+        const captchaImage = document.getElementById('captchaImage');
+        const resultText = document.getElementById('resultText');
+        const resultContainer = document.getElementById('resultContainer');
         const loadingSpinner = document.getElementById('loadingSpinner');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const imageLoadingIndicator = document.getElementById('imageLoadingIndicator');
+        const errorAlert = document.getElementById('errorAlert');
+        const imageContainer = document.getElementById('imageContainer');
 
-        // --- Default Image ---
-        // This is a placeholder for the default image.
-        // In a real application, you might load this from a server or a more robust data URI.
-        const defaultImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // A tiny transparent PNG
+        // --- Default Sample Image ---
+        // Data URI for a sample image (replace with your actual sample.png if needed)
+        const defaultSampleImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // A 1x1 transparent pixel as a placeholder
 
         // --- Event Listeners ---
 
-        // Load image from URL when the button is clicked
-        loadFromUrlBtn.addEventListener('click', () => {
+        // Handle URL input and display image preview
+        imageUrlInput.addEventListener('input', () => {
             const url = imageUrlInput.value.trim();
             if (url) {
-                loadImageFromUrl(url);
+                // Basic URL validation
+                try {
+                    new URL(url); // Throws an error if not a valid URL
+                    captchaImage.src = url;
+                    captchaImage.style.display = 'block'; // Show image
+                    errorAlert.classList.add('d-none'); // Hide error if URL is valid
+                } catch (e) {
+                    captchaImage.src = '#'; // Clear image
+                    captchaImage.style.display = 'none'; // Hide image
+                    showError("Invalid URL format.");
+                }
             } else {
-                displayError('Please enter an image URL.');
+                captchaImage.src = '#'; // Clear image
+                captchaImage.style.display = 'none'; // Hide image
+                resultText.textContent = 'Enter a URL and click "Solve Captcha" to see the result.';
+                resultContainer.style.backgroundColor = '#e9ecef';
             }
         });
 
-        // Solve captcha when the button is clicked
-        solveCaptchaBtn.addEventListener('click', async () => {
-            const imageUrl = captchaImage.src;
-            const enteredText = captchaInput.value.trim();
+        // Handle solve button click
+        solveButton.addEventListener('click', async () => {
+            const url = imageUrlInput.value.trim();
 
-            // Clear previous messages
-            clearMessages();
-            showLoading(true);
+            // Reset UI states
+            hideError();
+            resultText.textContent = '';
+            resultContainer.style.backgroundColor = '#e9ecef';
+            solveButton.disabled = true;
+            loadingSpinner.style.display = 'block';
 
-            // Basic validation
-            if (!imageUrl || imageUrl === defaultImageUrl) {
-                displayError('Please load a valid captcha image first.');
-                showLoading(false);
-                return;
-            }
-            if (!enteredText) {
-                displayError('Please enter the captcha text.');
-                showLoading(false);
+            if (!url) {
+                showError("Please enter an image URL.");
+                resetUIState();
                 return;
             }
 
-            // In a real scenario, you would send the image URL and the entered text to your backend.
-            // The backend would then use an AI model to verify the captcha.
-            // For this example, we'll simulate a successful or failed response.
+            // Validate URL again before sending
+            try {
+                new URL(url);
+            } catch (e) {
+                showError("Invalid URL format.");
+                resetUIState();
+                return;
+            }
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
+                // --- Simulate API Call ---
+                // In a real application, you would make a fetch request to your AI_SOLVER_API_URL
+                // Example:
+                /*
+                const response = await fetch(AI_SOLVER_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageUrl: url }),
+                });
 
-                // --- SIMULATION LOGIC ---
-                // Replace this with your actual API call:
-                // const response = await fetch(CAPTCHA_SOLVER_API_URL, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({ imageUrl: imageUrl, enteredText: enteredText }),
-                // });
-                // const data = await response.json();
-                // if (!response.ok) {
-                //     throw new Error(data.message || 'Failed to solve captcha.');
-                // }
-                // if (data.success) {
-                //     displaySuccess('Captcha solved successfully!');
-                // } else {
-                //     displayError('Incorrect captcha text. Please try again.');
-                // }
-                // --- END SIMULATION LOGIC ---
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                // Simulate a successful solve if the input is not empty
-                if (enteredText.length > 0) {
-                    displaySuccess('Captcha solved successfully!');
+                const data = await response.json();
+                const solvedText = data.solvedText; // Assuming your API returns { solvedText: "..." }
+                */
+
+                // For demonstration purposes, simulate a successful API call with a delay
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network latency
+                const solvedText = simulateCaptchaSolving(url); // Replace with actual API response
+
+                if (solvedText) {
+                    resultText.textContent = solvedText;
+                    resultContainer.style.backgroundColor = '#d4edda'; // Success color
                 } else {
-                    displayError('Incorrect captcha text. Please try again.');
+                    showError("Could not solve the captcha. The AI might not recognize it.");
                 }
 
             } catch (error) {
-                console.error('Captcha solving error:', error);
-                displayError(`An error occurred: ${error.message}`);
+                console.error("Error solving captcha:", error);
+                showError("An error occurred while trying to solve the captcha. Please check the URL and try again.");
             } finally {
-                showLoading(false);
+                // Restore UI state
+                resetUIState();
             }
         });
 
         // --- Helper Functions ---
 
-        // Loads an image from a given URL into the captchaImage element
-        function loadImageFromUrl(url) {
-            clearMessages();
-            imageLoadingIndicator.classList.remove('d-none');
-            captchaImage.classList.add('d-none'); // Hide image while loading
-
-            // Use CORS proxy if needed for external images, or handle CORS on your backend.
-            // For simplicity, this example assumes the URL is accessible or a proxy is used.
-            // A more robust solution might involve fetching the image as a blob and displaying it.
-            captchaImage.onload = () => {
-                imageLoadingIndicator.classList.add('d-none');
-                captchaImage.classList.remove('d-none');
-                imageUrlInput.value = url; // Update input to the actual URL loaded
-            };
-            captchaImage.onerror = () => {
-                imageLoadingIndicator.classList.add('d-none');
-                captchaImage.classList.remove('d-none');
-                displayError(`Failed to load image from URL: ${url}. Please check the URL and try again.`);
-                captchaImage.src = defaultImageUrl; // Reset to default on error
-            };
-            captchaImage.src = url;
-        }
-
-        // Displays an error message
-        function displayError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('d-none');
-            successMessage.classList.add('d-none');
-        }
-
-        // Displays a success message
-        function displaySuccess(message) {
-            successMessage.textContent = message;
-            successMessage.classList.remove('d-none');
-            errorMessage.classList.add('d-none');
-        }
-
-        // Clears all messages
-        function clearMessages() {
-            errorMessage.textContent = '';
-            errorMessage.classList.add('d-none');
-            successMessage.textContent = '';
-            successMessage.classList.add('d-none');
-        }
-
-        // Shows or hides the main loading spinner
-        function showLoading(isLoading) {
-            if (isLoading) {
-                solveCaptchaBtn.disabled = true;
-                loadFromUrlBtn.disabled = true;
-                captchaInput.disabled = true;
-                loadingSpinner.classList.remove('d-none');
-                resultArea.style.minHeight = '50px'; // Prevent layout shift
+        // Function to simulate captcha solving (replace with actual API call)
+        function simulateCaptchaSolving(imageUrl) {
+            // This is a dummy function. In a real scenario, this would be the result from your AI API.
+            // You could add some logic here to return different "solved" texts based on the URL for testing.
+            if (imageUrl.includes("sample.png") || imageUrl.includes("default")) {
+                return "ABC123"; // Example solved text
+            } else if (imageUrl.includes("numbers")) {
+                return "7890";
+            } else if (imageUrl.includes("letters")) {
+                return "XYZ";
             } else {
-                solveCaptchaBtn.disabled = false;
-                loadFromUrlBtn.disabled = false;
-                captchaInput.disabled = false;
-                loadingSpinner.classList.add('d-none');
-                resultArea.style.minHeight = '0';
+                return "Simulated Result: " + Math.random().toString(36).substring(2, 8).toUpperCase();
             }
+        }
+
+        // Function to display an error message
+        function showError(message) {
+            errorAlert.textContent = message || "An unexpected error occurred.";
+            errorAlert.classList.remove('d-none');
+        }
+
+        // Function to hide the error message
+        function hideError() {
+            errorAlert.classList.add('d-none');
+        }
+
+        // Function to reset UI to its initial state after solving or error
+        function resetUIState() {
+            solveButton.disabled = false;
+            loadingSpinner.style.display = 'none';
         }
 
         // --- Initialization ---
 
-        // Set the default image on page load
-        captchaImage.src = defaultImageUrl;
+        // Set the default sample image on page load
+        // The URL parameter handling will override this if present.
+        imageUrlInput.value = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // Placeholder
+        captchaImage.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // Placeholder
+        captchaImage.style.display = 'none'; // Hide initially
 
         // Check for URL parameter on page load
         const urlParams = new URLSearchParams(window.location.search);
-        const imageUrlParam = urlParams.get('url');
-        if (imageUrlParam) {
-            imageUrlInput.value = imageUrlParam;
-            loadImageFromUrl(imageUrlParam);
+        const urlParam = urlParams.get('url');
+
+        if (urlParam) {
+            imageUrlInput.value = urlParam;
+            // Trigger the input event to show the image preview
+            imageUrlInput.dispatchEvent(new Event('input'));
         }
     </script>
 </body>
