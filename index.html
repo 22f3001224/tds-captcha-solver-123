@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Captcha Solver</title>
-    <!-- Bootstrap 5 CSS from CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -26,10 +25,18 @@
             border-radius: 4px;
             margin-bottom: 20px;
         }
-        .loading-spinner {
-            display: none; /* Hidden by default */
-            width: 3rem;
-            height: 3rem;
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 4px;
         }
         .error-message {
             color: #dc3545;
@@ -41,28 +48,223 @@
             font-weight: bold;
             margin-top: 15px;
         }
-        .form-control {
-            min-height: 50px; /* Make input field a bit taller */
-        }
-        .btn-primary {
-            min-height: 50px; /* Match button height with input */
+        .form-label {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center mb-4">AI Captcha Solver</h1>
-        <p class="text-center text-muted mb-4">Paste an image URL or use the default sample to solve the captcha.</p>
 
-        <div class="mb-3">
+        <div class="mb-3 position-relative">
             <label for="imageUrl" class="form-label">Image URL</label>
-            <input type="url" class="form-control" id="imageUrl" placeholder="https://example.com/path/to/your/captcha.png">
+            <input type="url" class="form-control" id="imageUrl" placeholder="Enter image URL (e.g., https://example.com/captcha.png)">
+            <button id="loadFromUrlBtn" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2">Load</button>
         </div>
 
         <div class="text-center mb-4">
-            <button id="loadUrlBtn" class="btn btn-outline-primary me-2">Load from URL</button>
-            <button id="useSampleBtn" class="btn btn-secondary">Use Sample Image</button>
+            <img id="captchaImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Captcha Image" class="captcha-image">
+            <div id="imageLoadingIndicator" class="loading-overlay d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading image...</span>
+                </div>
+            </div>
         </div>
 
-        <div id="captchaDisplay" class="text-center mb-4">
-            <img id="captchaImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAeCAYAAADaW5t/AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADISURBVHhe7dYxDYAwDERRX23+114wS0oN23b+w/q+d40z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4z/w4
+        <div class="mb-3">
+            <label for="captchaInput" class="form-label">Enter Captcha Text</label>
+            <input type="text" class="form-control" id="captchaInput" placeholder="Enter the text from the image">
+        </div>
+
+        <div class="d-grid gap-2">
+            <button id="solveCaptchaBtn" class="btn btn-primary btn-lg">Solve Captcha</button>
+        </div>
+
+        <div id="resultArea" class="mt-4 text-center">
+            <div id="loadingSpinner" class="spinner-border text-primary d-none" role="status">
+                <span class="visually-hidden">Solving...</span>
+            </div>
+            <div id="errorMessage" class="error-message d-none"></div>
+            <div id="successMessage" class="success-message d-none"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        // Replace with your actual API endpoint for captcha solving.
+        // This is a placeholder and will not work without a backend.
+        const CAPTCHA_SOLVER_API_URL = 'YOUR_CAPTCHA_SOLVER_API_ENDPOINT'; // e.g., '/api/solve' or 'https://your-backend.com/solve'
+
+        // --- DOM Elements ---
+        const captchaImage = document.getElementById('captchaImage');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const loadFromUrlBtn = document.getElementById('loadFromUrlBtn');
+        const captchaInput = document.getElementById('captchaInput');
+        const solveCaptchaBtn = document.getElementById('solveCaptchaBtn');
+        const resultArea = document.getElementById('resultArea');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const imageLoadingIndicator = document.getElementById('imageLoadingIndicator');
+
+        // --- Default Image ---
+        // This is a placeholder for the default image.
+        // In a real application, you might load this from a server or a more robust data URI.
+        const defaultImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // A tiny transparent PNG
+
+        // --- Event Listeners ---
+
+        // Load image from URL when the button is clicked
+        loadFromUrlBtn.addEventListener('click', () => {
+            const url = imageUrlInput.value.trim();
+            if (url) {
+                loadImageFromUrl(url);
+            } else {
+                displayError('Please enter an image URL.');
+            }
+        });
+
+        // Solve captcha when the button is clicked
+        solveCaptchaBtn.addEventListener('click', async () => {
+            const imageUrl = captchaImage.src;
+            const enteredText = captchaInput.value.trim();
+
+            // Clear previous messages
+            clearMessages();
+            showLoading(true);
+
+            // Basic validation
+            if (!imageUrl || imageUrl === defaultImageUrl) {
+                displayError('Please load a valid captcha image first.');
+                showLoading(false);
+                return;
+            }
+            if (!enteredText) {
+                displayError('Please enter the captcha text.');
+                showLoading(false);
+                return;
+            }
+
+            // In a real scenario, you would send the image URL and the entered text to your backend.
+            // The backend would then use an AI model to verify the captcha.
+            // For this example, we'll simulate a successful or failed response.
+
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
+
+                // --- SIMULATION LOGIC ---
+                // Replace this with your actual API call:
+                // const response = await fetch(CAPTCHA_SOLVER_API_URL, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({ imageUrl: imageUrl, enteredText: enteredText }),
+                // });
+                // const data = await response.json();
+                // if (!response.ok) {
+                //     throw new Error(data.message || 'Failed to solve captcha.');
+                // }
+                // if (data.success) {
+                //     displaySuccess('Captcha solved successfully!');
+                // } else {
+                //     displayError('Incorrect captcha text. Please try again.');
+                // }
+                // --- END SIMULATION LOGIC ---
+
+                // Simulate a successful solve if the input is not empty
+                if (enteredText.length > 0) {
+                    displaySuccess('Captcha solved successfully!');
+                } else {
+                    displayError('Incorrect captcha text. Please try again.');
+                }
+
+            } catch (error) {
+                console.error('Captcha solving error:', error);
+                displayError(`An error occurred: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // --- Helper Functions ---
+
+        // Loads an image from a given URL into the captchaImage element
+        function loadImageFromUrl(url) {
+            clearMessages();
+            imageLoadingIndicator.classList.remove('d-none');
+            captchaImage.classList.add('d-none'); // Hide image while loading
+
+            // Use CORS proxy if needed for external images, or handle CORS on your backend.
+            // For simplicity, this example assumes the URL is accessible or a proxy is used.
+            // A more robust solution might involve fetching the image as a blob and displaying it.
+            captchaImage.onload = () => {
+                imageLoadingIndicator.classList.add('d-none');
+                captchaImage.classList.remove('d-none');
+                imageUrlInput.value = url; // Update input to the actual URL loaded
+            };
+            captchaImage.onerror = () => {
+                imageLoadingIndicator.classList.add('d-none');
+                captchaImage.classList.remove('d-none');
+                displayError(`Failed to load image from URL: ${url}. Please check the URL and try again.`);
+                captchaImage.src = defaultImageUrl; // Reset to default on error
+            };
+            captchaImage.src = url;
+        }
+
+        // Displays an error message
+        function displayError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('d-none');
+            successMessage.classList.add('d-none');
+        }
+
+        // Displays a success message
+        function displaySuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove('d-none');
+            errorMessage.classList.add('d-none');
+        }
+
+        // Clears all messages
+        function clearMessages() {
+            errorMessage.textContent = '';
+            errorMessage.classList.add('d-none');
+            successMessage.textContent = '';
+            successMessage.classList.add('d-none');
+        }
+
+        // Shows or hides the main loading spinner
+        function showLoading(isLoading) {
+            if (isLoading) {
+                solveCaptchaBtn.disabled = true;
+                loadFromUrlBtn.disabled = true;
+                captchaInput.disabled = true;
+                loadingSpinner.classList.remove('d-none');
+                resultArea.style.minHeight = '50px'; // Prevent layout shift
+            } else {
+                solveCaptchaBtn.disabled = false;
+                loadFromUrlBtn.disabled = false;
+                captchaInput.disabled = false;
+                loadingSpinner.classList.add('d-none');
+                resultArea.style.minHeight = '0';
+            }
+        }
+
+        // --- Initialization ---
+
+        // Set the default image on page load
+        captchaImage.src = defaultImageUrl;
+
+        // Check for URL parameter on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const imageUrlParam = urlParams.get('url');
+        if (imageUrlParam) {
+            imageUrlInput.value = imageUrlParam;
+            loadImageFromUrl(imageUrlParam);
+        }
+    </script>
+</body>
+</html>
