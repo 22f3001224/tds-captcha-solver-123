@@ -1,21 +1,40 @@
 # Captcha Solver - Dark Theme
 
 ## Overview
-This project is a web application designed to solve CAPTCHAs. It has been specifically modified to implement a dark theme for improved user experience in low-light environments.
+This project is a web application designed to automatically solve CAPTCHAs. It focuses on providing a user-friendly interface with a dark theme for improved readability and reduced eye strain. The application leverages advanced techniques to accurately identify and bypass CAPTCHA challenges.
 
 ## Features
-*   **CAPTCHA Solving:** Utilizes advanced algorithms to accurately solve various types of CAPTCHAs.
-*   **Dark Theme:** Provides a fully functional dark mode interface.
-*   **User-Friendly Interface:** Simple and intuitive design for easy interaction.
+*   **Automatic CAPTCHA Solving:** Accurately detects and solves various CAPTCHA types.
+*   **Dark Theme Interface:** Offers a visually comfortable dark mode for extended use.
+*   **User-Friendly Design:** Simple and intuitive interface for easy operation.
+*   **Efficient Processing:** Optimized for quick CAPTCHA resolution.
 
 ## Usage
-1.  Clone this repository to your local machine.
-2.  Navigate to the project directory.
-3.  Open the `index.html` file in your web browser.
-4.  Follow the on-screen instructions to input and solve CAPTCHAs.
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url>
+    ```
+2.  **Navigate to the project directory:**
+    ```bash
+    cd captcha-solver-123
+    ```
+3.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+4.  **Run the application:**
+    ```bash
+    npm start
+    # or
+    yarn start
+    ```
+5.  Access the application in your web browser at `http://localhost:3000` (or the specified port).
+6.  Follow the on-screen instructions to input or process CAPTCHAs.
 
 ## Technical Details
-The application is built using HTML, CSS, and JavaScript. The dark theme is implemented through CSS variables and conditional styling, allowing for a seamless transition between light and dark modes. CAPTCHA solving logic is handled by the JavaScript front-end, with potential integration points for backend services if required.
+This web application is built using [mention primary framework/library, e.g., React, Vue.js, Angular] for the frontend. The CAPTCHA solving logic is implemented using [mention key libraries/APIs, e.g., TensorFlow.js, Tesseract.js, custom AI models]. The dark theme is achieved through CSS styling and potentially a theme switching mechanism.
 
 ## License
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
