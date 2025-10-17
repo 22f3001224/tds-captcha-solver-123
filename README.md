@@ -2,27 +2,27 @@
 
 ## Overview
 
-This web application provides a user-friendly interface to solve image-based CAPTCHAs. It allows users to submit an image URL, and the application will process and return the solved CAPTCHA text. The application is fully responsive and designed to handle various image formats.
+This is a fully responsive web application designed to solve CAPTCHAs from provided image URLs. It allows users to submit a URL pointing to a CAPTCHA image, and the application will attempt to solve and return the CAPTCHA text. A default sample image is provided for immediate testing.
 
 ## Features
 
-*   **URL-based CAPTCHA Solving:** Submit CAPTCHA images via a provided URL.
-*   **Default Sample Image:** Includes a default sample CAPTCHA image for immediate testing.
-*   **Responsive Design:** Adapts seamlessly to different screen sizes (desktops, tablets, mobile).
-*   **Clear User Interface:** Simple and intuitive design for ease of use.
+*   **Responsive Design:** Adapts seamlessly to various screen sizes (desktops, tablets, mobile devices).
+*   **URL Input:** Accepts CAPTCHA image URLs via a query parameter (`?url=https://.../image.png`).
+*   **Default Sample:** Includes a pre-configured sample CAPTCHA image for easy demonstration.
+*   **Image Processing:** Capable of fetching and processing CAPTCHA images from external URLs.
+*   **Solver Integration:** Integrates with a CAPTCHA solving mechanism (implementation details in Technical Details).
 
 ## Usage
 
-1.  **Access the Application:** Navigate to the deployed web application URL.
-2.  **Provide CAPTCHA Image URL:** In the input field, paste the URL of the CAPTCHA image you wish to solve.
-3.  **Submit:** Click the "Solve" button.
-4.  **View Result:** The solved CAPTCHA text will be displayed.
-5.  **Default Sample:** To test with the default sample, simply click the "Solve" button without entering a URL.
+1.  **Access the Application:** Open the deployed web application in your browser.
+2.  **Solve a Specific CAPTCHA:** To solve a CAPTCHA from a specific URL, append the `?url=` parameter to the application's base URL followed by the direct URL to your CAPTCHA image.
+    *   Example: `https://your-app-domain.com/?url=https://example.com/path/to/your/captcha.png`
+3.  **Use Default Sample:** If no URL is provided, the application will automatically attempt to solve the default sample CAPTCHA image.
 
 ## Technical Details
 
-This project utilizes [mention key technologies, e.g., a Python backend with Flask/Django for image processing and a JavaScript frontend with React/Vue for the UI. Briefly explain the core logic, e.g., "The backend employs OCR (Optical Character Recognition) libraries to analyze the image and extract text."].
+The application utilizes [mention your primary frontend framework/library, e.g., React, Vue.js, plain HTML/CSS/JS] for the user interface and responsiveness. The backend [mention your backend technology, e.g., Node.js with Express, Python with Flask/Django] handles image fetching and processing. The core CAPTCHA solving logic is implemented using [briefly describe your CAPTCHA solving approach, e.g., a pre-trained machine learning model, an external CAPTCHA solving API]. The image is fetched using [mention image fetching method, e.g., `fetch` API, Axios] and then passed to the solver.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
