@@ -1,25 +1,29 @@
-# Captcha Solver - Dark Theme
+# Captcha Solver Web Application
 
 ## Overview
-This project is a web application designed to solve CAPTCHAs. It focuses on providing a user-friendly interface with a dark theme for improved readability and reduced eye strain.
+
+This web application provides a user-friendly interface to solve image-based CAPTCHAs. It accepts a URL pointing to a CAPTCHA image and returns the recognized text, making it useful for automated tasks or accessibility. The application is fully responsive and designed for ease of use.
 
 ## Features
-*   **CAPTCHA Solving:** Utilizes advanced algorithms to accurately solve various types of CAPTCHAs.
-*   **Dark Theme:** Offers a visually comfortable dark mode interface.
-*   **User-Friendly Interface:** Intuitive design for easy interaction.
-*   **Responsive Design:** Adapts to different screen sizes for optimal viewing on various devices.
+
+*   **URL Input:** Accepts CAPTCHA image URLs via a query parameter (`?url=https://.../image.png`).
+*   **Default Sample:** Includes a default sample CAPTCHA image for immediate testing.
+*   **Responsive Design:** Adapts seamlessly to various screen sizes (desktops, tablets, mobile).
+*   **Image Display:** Visually presents the CAPTCHA image for verification.
+*   **Text Output:** Displays the recognized text from the CAPTCHA.
 
 ## Usage
-1.  Clone this repository to your local machine.
-2.  Navigate to the project directory.
-3.  Open the `index.html` file in your web browser.
-4.  Follow the on-screen instructions to input or upload CAPTCHAs for solving.
+
+1.  **Access the Application:** Open the web application in your browser.
+2.  **Provide CAPTCHA URL (Optional):** To solve a specific CAPTCHA, append the `?url=` query parameter to the application's URL followed by the direct URL to your CAPTCHA image. For example:
+    `http://your-app-domain.com/?url=https://example.com/path/to/your/captcha.png`
+3.  **Default Sample:** If no URL is provided, the application will automatically attempt to solve the attached sample CAPTCHA.
+4.  **View Result:** The recognized text will be displayed on the page.
 
 ## Technical Details
-The application is built using standard web technologies:
-*   **HTML:** For structuring the web page content.
-*   **CSS:** For styling the user interface, including the dark theme implementation.
-*   **JavaScript:** For handling user interactions, CAPTCHA processing logic, and API calls (if applicable).
+
+This project utilizes [mention key technologies, e.g., HTML, CSS, JavaScript for frontend; Python/Flask/Node.js for backend; a specific OCR library like Tesseract.js or a cloud-based OCR API]. The frontend handles user interaction and displays results, while the backend (or client-side JavaScript) processes the image URL, performs OCR, and returns the solved text.
 
 ## License
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
